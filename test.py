@@ -1,36 +1,39 @@
 from PIL import Image
 
-def hex_to_ascii(hex_str):
-    # Convert hexadecimal string to integer
-    decimal_value = int(hex_str, 16)
-    # Convert integer to ASCII character
-    ascii_char = chr(decimal_value)
-    return ascii_char
 
-def image_to_ascii('D.png'):
-    # Open the image
-    img = Image.open('D.png')
-    width, height = img.size
+def extract_hex_values():
+    try:
 
-    ascii_art = ''
+        img = Image.open("D.png")
+        result = ""
+        for y in range(1):
+            for x in range(53):
+                # Get the RGB color value of the pixel
+                pixel = img.getpixel((x, y))
 
-    # Iterate through each pixel row
-    for y in range(height):
-        # Iterate through each pixel column
-        for x in range(width):
-            # Get the color of the pixel at (x, y)
-            color = img.getpixel((x, y))
-            # Convert color to hexadecimal string
-            hex_color = '#{:02x}{:02x}{:02x}'.format(color[0], color[1], color[2])
-            # Convert hexadecimal color to ASCII character
-            ascii_art += hex_to_ascii(hex_color.lstrip('#'))
-        ascii_art += '\n'  # Add newline at the end of each row
+                # If the pixel is an integer, convert it to an RGB tuple
+                if isinstance(pixel, int):
+                    pixel = (pixel, pixel, pixel)
+                # If the image mode is "P" (palette), convert the pixel to RGB tuple
+                elif img.mode == "P":
+                    pixel = img.palette[pixel]
 
-    return ascii_art
+                r, g, b = pixel
 
-# Path to your image file
-image_path = 'D.png'
+                # Convert RGB to hexadecimal
+                hex_value = "#{:02x}{:02x}{:02x}".format(r, g, b)
 
-# Convert image to ASCII art
-result = image_to_ascii('D.png')
-print(result)
+                # Convert hexadecimal to ASCII
+                ascii_char = bytearray.fromhex(hex_value.lstrip('#')).decode("utf-8")
+
+                # Append the ASCII character to the result
+                result += ascii_char
+
+        return result
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+# Call the function
+output = extract_hex_values()
+print(output)
